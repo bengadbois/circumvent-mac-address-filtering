@@ -9,13 +9,16 @@ MACAddresses=$(sudo iwlist wlan0 scan | grep Address | sed s/Cell\ [0-9]*\ \-\ A
 SSIDs=$(sudo iwlist wlan0 scan | grep ESSID | sed s/ESSID\:// | sed s/\"// | sed s/\"//)
 
 echo Here are the list of wireless connections available
-for s in $SSIDs
+for ((i=0; i<${SSIDS[@]} ;i++))
 do
-	echo $s
+	echo $i ": " ${SSIDS[i]}
 done
 echo Which would you like to connect to?
 
 read chosenSSID
+if [ $chosenSSID -lt 0 ] && [ $chosenSSID -gt ${SSIDS[@]} ] ; then
+    echo "Invalid selection"
+fi
 #verify available
 #for s in $SSIDs
 #do
