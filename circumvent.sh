@@ -4,44 +4,33 @@
 # sudo iwlist wlan0 scan
 
 #All info
-Info=$(sudo iwlist wlan0 scan)
-MACAddresses=$(sudo iwlist wlan0 scan | grep Address | sed s/Cell\ [0-9]*\ \-\ Address\:\ //)
-SSIDs=$(sudo iwlist wlan0 scan | grep ESSID | sed s/ESSID\:// | sed s/\"// | sed s/\"//)
-
-echo Here are the list of wireless connections available
-for ((i=0; i<${SSIDS[@]} ;i++))
-do
-	echo $i ": " ${SSIDS[i]}
-done
-echo Which would you like to connect to?
-
-read chosenSSID
-if [ $chosenSSID -lt 0 ] && [ $chosenSSID -gt ${SSIDS[@]} ] ; then
-    echo "Invalid selection"
+if [ $# -eq 0 ];
+then
+	echo Requires one argument as the SSID of the wireless network to connect to
+	exit
 fi
-#verify available
-#for s in $SSIDs
-#do
-#	if [ $s == $chosenSSID ];
-#	then
-#		echo 'found SSID'
-#		verified='found'
-#	fi
-#done
-#if [ -z "$verified" ]; #TODO expression doesn't work right now
-#then
-#	echo 'blah'
-#else
-#	echo 'Network not found, disconnecting'
-#	exit
-#fi
 
-#TODO assign $MAC to corresponding MAC address from $MACAddresses
+
+sudo iwconfig wlan0 essid $1
+
+#TODO sniff for a valid MAC
+
+sudo iwconfig wlan0 $MAC #mac of router to join
+
+sudo dhclient wlan0
+
+#ping to verify connected, otherwise goto picking a new MAC
+
+
+#Info=$(sudo iwlist wlan0 scan)
+MACAddresses=$(sudo iwlist wlan0 scan essid $1 | grep Address | sed s/Cell\ [0-9]*\ \-\ Address\:\ //)
+MAC=${MACAddresses[@]} | sed s/\ *//
+echo "THE MAC IS " $MAC
 
 #configure before joining
   sudo iwconfig wlan0 $MAC #mac of router to join
-  sudo iwconfig wlan0 essid $chosenSSID #name of network
-  sudo iwconfig wlan0 freq 2.437
+  sudo iwconfig wlan0 essid $1 #name of network
+  sudo iwconfig wlan0 freq 2.437 #TODO can probably remove
    
 #connect!
    sudo dhclient wlan0
