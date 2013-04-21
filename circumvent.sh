@@ -15,12 +15,19 @@ fi
 #sniff for a valid MAC
 # I flag for promisc and e for mac addresses
 # grep for our network ssid then ignore beacons
-sudo tcpdump -Ie -i $2 | grep "$1" | grep -i -v "beacon"
+sudo tcpdump -Ie -i $2 \
+    | grep "$1" \
+    | grep -i -v "beacon" 
+# TODO get the DA field
+
+#spoof the mac from above
+#TODO might have to edit /etc/networks/interface
+#ifconfig $2 down
+#ifconfig $2 hw ether $MAC
+#ifconfig $2 up
 
 # join the ssid
-sudo iwconfig $2 essid $1
-
-#sudo iwconfig $2 $MAC #mac of router to join
+#sudo iwconfig $2 essid $1
 
 #sudo dhclient $2
 
