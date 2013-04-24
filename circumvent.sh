@@ -9,7 +9,10 @@ then
 	exit
 fi
 
-#Check fori root
+SSID=$1
+Interface=$2
+
+#Check for root access
 if [ ! $( id -u ) -eq 0 ]; then
     echo "Please enter root's password"
     exec sudo "${Base}/${0}  ${CMDLN_ARGS}" # Call this prog as root
@@ -25,33 +28,12 @@ echo $routerAddr
 #sniff for a valid MAC
 # I flag for promisc and e for mac addresses
 # grep for our network ssid then ignore beacons
-echo "Starting listening for 15s"
-tcpdumpBin=`which tcpdump`
-#TCPOUT=`tcpdump -Ie -i $2 -c 25 -n dst port 80`
-echo $TCPOUT
-echo \n
-echo \n
-echo \n
-echo \n
-echo \n
-echo \n
-echo \n
-echo $TCPOUT # \
-#    | grep "$1" #\
-    #| grep -i "beacon" #| sed s/.*DA// | sed s/\ *// 
-echo "Finished Listening"
+echo "Starting listening for a MAC address to spoof"
+
 # TODO get the DA field
-echo $MAC
+
 #spoof the mac from above
-#TODO might have to edit /etc/networks/interface
-#sudo ifconfig $2 down hw ether $MAC
-#sudo ifconfig $2 up
+sudo ifconfig $2 down hw ether $MAC
+sudo ifconfig $2 up
+
 echo "Changed your mac address!"
-
-# join the ssid
-#iwconfig $2 essid $1
-
-#dhclient $2
-
-#ping to verify connected, otherwise goto picking a new MAC
-
