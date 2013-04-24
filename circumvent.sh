@@ -32,10 +32,10 @@ echo $routerAddr
 # I flag for promisc and e for mac addresses
 # grep for our network ssid then ignore beacons
 echo "Starting listening for a MAC address to spoof"
-MAC=`tcpdump -i $2 -e -c 5 2> /dev/null \
+MAC=`tcpdump -i $2 -e -c 5 udp 2> /dev/null \
     | sed s/\ \(oui.*// \
     | sed s/.*\ // \
-    | head -n1`
+    | head -n5`
 echo $MAC
 
 echo "If the mac address is the same as the routers run this script again"
