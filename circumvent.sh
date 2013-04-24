@@ -14,26 +14,34 @@ Interface=$2
 
 #Check for root access
 if [ ! $( id -u ) -eq 0 ]; then
-    echo "Please enter root's password"
-    exec sudo "${Base}/${0}  ${CMDLN_ARGS}" # Call this prog as root
+    echo "This script must be run with root permissions"
     exit ${?}
 fi
 
 
 #get the mac address of the router given the SSID
 echo "Finding the mac address of the router..."
-routerAddr=`tcpdump -Ie -i $2 -l -c 100 2> /dev/null | grep "$1" | sed s/.*BSSID:// | sed s/\ \(.*//  | head -n1`
+routerAddr=`tcpdump -Ie -i $2 -l -c 100 2> /dev/null \
+    | grep "$1" \
+    | sed s/.*BSSID:// \
+    | sed s/\ \(.*//  \
+    | head -n1`
 echo $routerAddr
 
 #sniff for a valid MAC
 # I flag for promisc and e for mac addresses
 # grep for our network ssid then ignore beacons
 echo "Starting listening for a MAC address to spoof"
+MAC=`tcpdump -i $2 -e -c 5 2> /dev/null \
+    | sed s/\ \(oui.*// \
+    | sed s/.*\ // \
+    | head -n1`
+echo $MAC
 
-# TODO get the DA field
+echo "If the mac address is the same as the routers run this script again"
 
 #spoof the mac from above
-sudo ifconfig $2 down hw ether $MAC
-sudo ifconfig $2 up
+ifconfig $2 down hw ether $MAC
+ifconfig $2 up
 
 echo "Changed your mac address!"
