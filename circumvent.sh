@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Outputs our list of networks
-# sudo iwlist wlan0 scan
-
 #All info
 if [ $# -lt 2 ];
 then
@@ -12,37 +9,43 @@ then
 	exit
 fi
 
+#Check fori root
+if [ ! $( id -u ) -eq 0 ]; then
+    echo "Please enter root's password"
+    exec sudo "${Base}/${0}  ${CMDLN_ARGS}" # Call this prog as root
+    exit ${?}
+fi
+
 #sniff for a valid MAC
 # I flag for promisc and e for mac addresses
 # grep for our network ssid then ignore beacons
-sudo tcpdump -Ie -i $2 \
-    | grep "$1" \
-    | grep -i -v "beacon" 
+echo "Starting listening for 15s"
+tcpdumpBin=`which tcpdump`
+TCPOUT=`tcpdump -Ie -i $2 -c 25 -n dst port 80`
+echo $TCPOUT
+echo \n
+echo \n
+echo \n
+echo \n
+echo \n
+echo \n
+echo \n
+echo $TCPOUT # \
+#    | grep "$1" #\
+    #| grep -i "beacon" #| sed s/.*DA// | sed s/\ *// 
+echo "Finished Listening"
 # TODO get the DA field
-
+echo $MAC
 #spoof the mac from above
 #TODO might have to edit /etc/networks/interface
-#ifconfig $2 down
-#ifconfig $2 hw ether $MAC
-#ifconfig $2 up
+sudo ifconfig $2 down hw ether $MAC
+sudo ifconfig $2 up
+echo "Changed your mac address!"
 
 # join the ssid
-#sudo iwconfig $2 essid $1
+#iwconfig $2 essid $1
 
-#sudo dhclient $2
+#dhclient $2
 
 #ping to verify connected, otherwise goto picking a new MAC
 
-
-#Info=$(sudo iwlist wlan0 scan)
-#MACAddresses=$(sudo iwlist wlan0 scan essid $1 | grep Address | sed s/Cell\ [0-9]*\ \-\ Address\:\ //)
-#MAC=${MACAddresses[@]} | sed s/\ *//
-#echo "THE MAC IS " $MAC
-
-#configure before joining
-#  sudo iwconfig wlan0 $MAC #mac of router to join
-#  sudo iwconfig wlan0 essid $1 #name of network
-#  sudo iwconfig wlan0 freq 2.437 #TODO can probably remove
-   
-#connect!
-#   sudo dhclient wlan0
