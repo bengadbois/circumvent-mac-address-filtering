@@ -21,8 +21,8 @@ fi
 
 #get the mac address of the router given the SSID
 echo "Finding the mac address of the router..."
-routerAddr=`tcpdump -Ie -i $2 -l -c 100 2> /dev/null \
-    | grep "$1" \
+routerAddr=`tcpdump -Ie -i $Interface -l -c 100 2> /dev/null \
+    | grep "$SSID" \
     | sed s/.*BSSID:// \
     | sed s/\ \(.*//  \
     | head -n1`
@@ -32,7 +32,7 @@ echo $routerAddr
 # I flag for promisc and e for mac addresses
 # grep for our network ssid then ignore beacons
 echo "Starting listening for a MAC address to spoof"
-MAC=`tcpdump -i $2 -e -c 5 udp 2> /dev/null \
+MAC=`tcpdump -i $Interface -e -c 5 udp 2> /dev/null \
     | sed s/\ \(oui.*// \
     | sed s/.*\ // \
     | head -n5`
@@ -41,7 +41,7 @@ echo $MAC
 echo "If the mac address is the same as the routers run this script again"
 
 #spoof the mac from above
-ifconfig $2 down hw ether $MAC
-ifconfig $2 up
+ifconfig $Interface down hw ether $MAC
+ifconfig $Interface up
 
 echo "Changed your mac address!"
